@@ -43,7 +43,7 @@ def extract_answers_for_grader(pdf_file):
     final_db = {k: v for k, v in db_answers.items() if len(v) > 0}
     return final_db
 
-st.title("컴팩트 기출 정답 자동 추출기 (Perfect Ver.)")
+st.title("컴팩트기출 정답 자동 추출기")
 st.write("PDF 원고를 업로드하면 채점기 코드에 삽입할 DB 배열을 오류 없이 만들어줍니다.")
 
 uploaded_file = st.file_uploader("PDF 파일 업로드", type="pdf")
