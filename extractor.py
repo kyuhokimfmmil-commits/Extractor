@@ -61,7 +61,14 @@ TOC_BOOK4 = [
 ]
 
 def clean_text(text):
+    # 한글, 영문, 숫자, 원문자만 남기고 띄어쓰기와 특수기호 제거
     return re.sub(r'[^가-힣a-zA-Z0-9①②③④⑤]', '', text)
+
+def get_relaxed_title(title):
+    # SECTION, CHAPTER 같은 영단어와 01 같은 숫자 앞의 0을 떼버려서 유연한 검색어 생성
+    # 예: "SECTION 01-1 직무유기죄" -> "1-1직무유기죄"
+    relaxed = re.sub(r'^(?:PART|CHAPTER|SECTION|CHATPER)\s*0*', '', title, flags=re.IGNORECASE)
+    return clean_text(relaxed)
 
 def extract_answers_by_book(text, toc_list):
     compressed_text = clean_text(text)
@@ -70,10 +77,18 @@ def extract_answers_by_book(text, toc_list):
     toc_indices = []
     for title in toc_list:
         clean_title = clean_text(title)
+        # 1차 시도: 정식 목차 이름으로 뒤에서부터 탐색
         idx = compressed_text.rfind(clean_title)
+        
+        # 2차 시도: 영단어가 생략되어 있으면 알맹이만(1-1직무유기죄) 가지고 탐색
+        if idx == -1:
+            relaxed_title = get_relaxed_title(title)
+            idx = compressed_text.rfind(relaxed_title)
+            
         if idx != -1:
             toc_indices.append({"idx": idx, "title": title})
             
+    # 찾은 인덱스 순서대로 정렬
     toc_indices.sort(key=lambda x: x["idx"])
     
     if not toc_indices:
