@@ -5,6 +5,8 @@ def extract_answers_from_txt(text):
     question_pattern = re.compile(r'^\s*0*(\d{1,3})\s*')
     ans_map = {'①': 1, '②': 2, '③': 3, '④': 4, '⑤': 5}
     
+    hierarchy_pattern = re.compile(r'^(PART\s*[ⅠⅡⅢⅣⅤⅥ]+|CHAPTER\s*\d+|CHATPER\s*\d+|SECTION\s*\d+|\d+-\d+)', re.IGNORECASE)
+    
     db_list = []
     current_item = None
     current_question = None
@@ -17,12 +19,11 @@ def extract_answers_from_txt(text):
         clean_line = re.sub(r'\s+\d+$', '', clean_line)
         clean_line = clean_line.replace("정답 및 해설", "").strip()
         
-        is_hierarchy = clean_line.upper().startswith(("PART", "CHAPTER", "CHATPER", "SECTION")) or re.match(r'^\d+-\d+', clean_line)
-        
-        if is_hierarchy:
+        if hierarchy_pattern.match(clean_line):
             if len(clean_line) < 40 and "①" not in clean_line:
-                if current_item is None or current_item['title'] != clean_line:
-                    current_item = {"title": clean_line, "ans": []}
+                clean_title = re.sub(r'\s+', ' ', clean_line).strip()
+                if current_item is None or current_item['title'] != clean_title:
+                    current_item = {"title": clean_title, "ans": []}
                     db_list.append(current_item)
                 continue
             
