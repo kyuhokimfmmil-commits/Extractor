@@ -17,7 +17,9 @@ def extract_answers_from_txt(text):
         clean_line = re.sub(r'\s+\d+$', '', clean_line)
         clean_line = clean_line.replace("정답 및 해설", "").strip()
         
-        if clean_line.upper().startswith(("PART", "CHAPTER", "CHATPER", "SECTION")):
+        is_hierarchy = clean_line.upper().startswith(("PART", "CHAPTER", "CHATPER", "SECTION")) or re.match(r'^\d+-\d+', clean_line)
+        
+        if is_hierarchy:
             if len(clean_line) < 40 and "①" not in clean_line:
                 if current_item is None or current_item['title'] != clean_line:
                     current_item = {"title": clean_line, "ans": []}
