@@ -70,7 +70,7 @@ def extract_answers_by_book(text, toc_list):
     toc_indices = []
     for title in toc_list:
         clean_title = clean_text(title)
-        idx = compressed_text.find(clean_title)
+        idx = compressed_text.rfind(clean_title)
         if idx != -1:
             toc_indices.append({"idx": idx, "title": title})
             
